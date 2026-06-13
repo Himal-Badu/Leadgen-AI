@@ -1,0 +1,1 @@
+"""LocalPulse AI - Core package."""

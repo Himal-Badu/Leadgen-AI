@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LocalPulse Pipeline Payload",
+  "type": "object",
+  "properties": {
+    "business_info": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "website": { "type": "string", "format": "uri" }
+      },
+      "required": ["name", "location"]
+    },
+    "scout_data": {
+      "type": "object",
+      "properties": {
+        "gbp": {
+          "type": "object",
+          "properties": {
+            "rating": { "type": "number" },
+            "review_count": { "type": "integer" },
+            "categories": { "type": "array", "items": { "type": "string" } },
+            "has_booking_link": { "type": "boolean" },
+            "photos_count": { "type": "integer" }
+          }
+        },
+        "website": {
+          "type": "object",
+          "properties": {
+            "load_time_ms": { "type": "integer" },
+            "is_mobile_friendly": { "type": "boolean" },
+            "has_booking_form": { "type": "boolean" },
+            "cta_count": { "type": "integer" }
+          }
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": { "type": "string" },
+              "rating": { "type": "number" },
+              "date": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      }
+    },
+    "analyzer_insights": {
+      "type": "object",
+      "properties": {
+        "trust_score_raw": { "type": "number" },
+        "visibility_score_raw": { "type": "number" },
+        "conversion_score_raw": { "type": "number" },
+        "gaps": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "sentiment_summary": { "type": "string" }
+      }
+    },
+    "scoring_output": {
+      "type": "object",
+      "properties": {
+        "total_health_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "breakdown": {
+          "type": "object",
+          "properties": {
+            "visibility": { "type": "integer" },
+            "trust": { "type": "integer" },
+            "conversion": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "growth_roadmap": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": { "type": "string" },
+          "impact": { "enum": ["High", "Medium", "Low"] },
+          "difficulty": { "enum": ["High", "Medium", "Low"] },
+          "priority_score": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "required": ["business_info"]
+}

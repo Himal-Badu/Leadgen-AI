@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalPulse AI — Free Business Health Snapshot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="hero">
+        <div class="container">
+            <div class="logo">LocalPulse<span class="dot">.</span>AI</div>
+            <h1>See Exactly Where Your Local Business Is Losing Leads</h1>
+            <p class="subtitle">
+                Get a free <strong>Business Health Snapshot</strong> in minutes.
+                We analyze your Google Profile, reviews, website speed, and competitor gaps — then show you the 3 highest-impact fixes.
+            </p>
+            <div class="trust-badges">
+                <span>✓ 100% Free</span>
+                <span>✓ No Credit Card</span>
+                <span>✓ 2-Min Setup</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="form-section">
+        <div class="container">
+            <div class="form-card" id="formCard">
+                <h2>Request Your Free Snapshot</h2>
+                <p class="form-desc">Enter your business details and we'll generate your report.</p>
+
+                <form id="reportForm" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="business_name">Business Name *</label>
+                            <input type="text" id="business_name" name="business_name" placeholder="e.g. Ace HVAC Services" required>
+                            <span class="error-msg" id="err-business_name"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" placeholder="you@company.com" required>
+                            <span class="error-msg" id="err-email"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" name="city" placeholder="e.g. Austin" required>
+                            <span class="error-msg" id="err-city"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State *</label>
+                            <select id="state" name="state" required>
+                                <option value="" disabled selected>Select state</option>
+                                <option value="AL">Alabama</option>
+                                <option value="AK">Alaska</option>
+                                <option value="AZ">Arizona</option>
+                                <option value="AR">Arkansas</option>
+                                <option value="CA">California</option>
+                                <option value="CO">Colorado</option>
+                                <option value="CT">Connecticut</option>
+                                <option value="DE">Delaware</option>
+                                <option value="FL">Florida</option>
+                                <option value="GA">Georgia</option>
+                                <option value="HI">Hawaii</option>
+                                <option value="ID">Idaho</option>
+                                <option value="IL">Illinois</option>
+                                <option value="IN">Indiana</option>
+                                <option value="IA">Iowa</option>
+                                <option value="KS">Kansas</option>
+                                <option value="KY">Kentucky</option>
+                                <option value="LA">Louisiana</option>
+                                <option value="ME">Maine</option>
+                                <option value="MD">Maryland</option>
+                                <option value="MA">Massachusetts</option>
+                                <option value="MI">Michigan</option>
+                                <option value="MN">Minnesota</option>
+                                <option value="MS">Mississippi</option>
+                                <option value="MO">Missouri</option>
+                                <option value="MT">Montana</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NV">Nevada</option>
+                                <option value="NH">New Hampshire</option>
+                                <option value="NJ">New Jersey</option>
+                                <option value="NM">New Mexico</option>
+                                <option value="NY">New York</option>
+                                <option value="NC">North Carolina</option>
+                                <option value="ND">North Dakota</option>
+                                <option value="OH">Ohio</option>
+                                <option value="OK">Oklahoma</option>
+                                <option value="OR">Oregon</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="RI">Rhode Island</option>
+                                <option value="SC">South Carolina</option>
+                                <option value="SD">South Dakota</option>
+                                <option value="TN">Tennessee</option>
+                                <option value="TX">Texas</option>
+                                <option value="UT">Utah</option>
+                                <option value="VT">Vermont</option>
+                                <option value="VA">Virginia</option>
+                                <option value="WA">Washington</option>
+                                <option value="WV">West Virginia</option>
+                                <option value="WI">Wisconsin</option>
+                                <option value="WY">Wyoming</option>
+                            </select>
+                            <span class="error-msg" id="err-state"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="niche">Industry / Niche *</label>
+                            <select id="niche" name="niche" required>
+                                <option value="" disabled selected>Select your industry</option>
+                                <option value="HVAC">HVAC / Heating & Cooling</option>
+                                <option value="Plumbing">Plumbing</option>
+                                <option value="Electrical">Electrical</option>
+                                <option value="Roofing">Roofing</option>
+                                <option value="Garage Doors">Garage Doors</option>
+                                <option value="Pest Control">Pest Control</option>
+                                <option value="Landscaping">Landscaping</option>
+                                <option value="Painting">Painting</option>
+                                <option value="Cleaning">Cleaning Services</option>
+                                <option value="Other">Other Home Services</option>
+                            </select>
+                            <span class="error-msg" id="err-niche"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="website">Website <span class="optional">(optional)</span></label>
+                            <input type="url" id="website" name="website" placeholder="https://yourcompany.com">
+                            <span class="error-msg" id="err-website"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="submitBtn">
+                        <span class="btn-text">Get My Free Snapshot</span>
+                        <span class="btn-spinner" style="display:none;">⏳ Processing...</span>
+                    </button>
+                </form>
+
+                <div class="success-message" id="successMessage" style="display:none;">
+                    <div class="success-icon">🎉</div>
+                    <h3>Your Snapshot is Being Prepared!</h3>
+                    <p id="successText"></p>
+                    <div class="status-box">
+                        <p><strong>Snapshot ID:</strong> <code id="snapshotId"></code></p>
+                        <p>Current status: <span id="statusBadge" class="badge pending">pending</span></p>
+                        <button class="btn-secondary" id="checkStatusBtn">Check Status</button>
+                    </div>
+                </div>
+
+                <div class="error-message" id="errorMessage" style="display:none;">
+                    <p id="errorText"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3>Submit Your Details</h3>
+                    <p>Tell us your business name, city, and industry. Takes 30 seconds.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3>We Scan the Web</h3>
+                    <p>Our AI analyzes your Google Business Profile, reviews, website, and competitors.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3>Get Your Report</h3>
+                    <p>Receive a 1-page Health Snapshot with your score and top 3 fixes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>LocalPulse AI — Business Intelligence for Local Service Companies</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
