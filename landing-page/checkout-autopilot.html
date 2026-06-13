@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LocalPulse Autopilot — $199/month</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">LocalPulse<span>.</span>AI</a>
+      <ul class="nav-links">
+        <li><a href="index.html#pricing">← Back to Pricing</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="hero checkout-hero">
+    <div class="container">
+      <div class="checkout-grid">
+        <div class="checkout-summary">
+          <h2>LocalPulse Autopilot</h2>
+          <div class="pricing-price">$199</div>
+          <div class="pricing-period">per month</div>
+          <p class="pricing-desc">An entire marketing team in your pocket. We do the work, you get the leads.</p>
+
+          <div class="guarantee-box">
+            <h4>30-Day "Lead Leak" Guarantee</h4>
+            <p>Try LocalPulse completely risk-free. If our platform doesn't find at least one critical lead leak you can fix to generate more revenue, we'll refund your first month in full.</p>
+          </div>
+
+          <div class="security-badges">
+            <span>🔒 Secure SSL Checkout</span>
+            <span>🛡️ 30-Day Guarantee</span>
+          </div>
+        </div>
+
+        <div class="checkout-features">
+          <h3>What You Get Today</h3>
+          <ul>
+            <li><strong>Everything in Pro</strong> — Unlimited roadmaps, benchmarking, search tracker, AI replies</li>
+            <li><strong>Done-For-You Drafts</strong> — AI-generated website updates, profile edits, and review responses</li>
+            <li><strong>One-Click Publishing</strong> — We text you the draft, you reply "Yes," and we push it live</li>
+            <li><strong>Conversion Flow Audits</strong> — Monthly testing of your booking forms and phone numbers</li>
+            <li><strong>Priority Support</strong> — Direct access to a LocalPulse growth specialist</li>
+          </ul>
+
+          <div class="checkout-cta">
+            <button class="btn btn-primary" onclick="startCheckout('autopilot')">Put Growth on Autopilot</button>
+            <p class="checkout-micro">Cancel anytime. No long-term contracts. No hidden fees.</p>
+          </div>
+          <script>
+          function startCheckout(tier) {
+            const btn = document.querySelector('.checkout-cta .btn');
+            btn.disabled = true;
+            btn.textContent = 'Redirecting...';
+            const apiUrl = (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1'))
+              ? 'http://localhost:5000/api/checkout/create'
+              : '/api/checkout/create';
+            fetch(apiUrl, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                tier: tier,
+                success_url: window.location.origin + '/checkout-success.html?tier=' + tier,
+                cancel_url: window.location.href,
+              }),
+            })
+            .then(r => r.json())
+            .then(data => {
+              if (data.success && data.checkout_url) {
+                window.location.href = data.checkout_url;
+              } else {
+                alert('Unable to start checkout: ' + (data.error || 'Unknown error'));
+                btn.disabled = false;
+                btn.textContent = 'Put Growth on Autopilot';
+              }
+            })
+            .catch(err => {
+              alert('Checkout error: ' + err.message);
+              btn.disabled = false;
+              btn.textContent = 'Put Growth on Autopilot';
+            });
+          }
+          </script>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p class="footer-copy">LocalPulse AI — Business Intelligence for Local Service Companies</p>
+    </div>
+  </footer>
+</body>
+</html>
