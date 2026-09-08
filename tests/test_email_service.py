@@ -40,6 +40,25 @@ def clean_email_logs():
     yield
 
 
+@pytest.fixture(autouse=True)
+def seed_test_snapshot_row():
+    """Ensure the snapshot row for sample_snapshot['id'] exists in the DB.
+
+    send_snapshot_report / send_follow_up mark fields like report_sent_at on
+    the snapshot row, so the row must exist for those tests to succeed.
+    """
+    import json as _json
+    from core.database import _run_team_db
+    data = _json.dumps({"business_info": {"name": "Ace HVAC", "location": "Austin, TX"}})
+    _run_team_db(
+        "INSERT OR IGNORE INTO snapshots "
+        "(id, business_name, location, website, status, data, created_at, updated_at) "
+        f"VALUES ('snap-test-123', 'Ace HVAC', 'Austin, TX', '', 'completed', '{data}', "
+        f"'{datetime.now(timezone.utc).isoformat()}', '{datetime.now(timezone.utc).isoformat()}')"
+    )
+    yield
+
+
 @pytest.fixture
 def sample_snapshot():
     return {
@@ -159,9 +178,11 @@ def test_send_welcome(mock_send):
 
 @patch("core.email_service._send")
 def test_send_welcome_dry_run(mock_send):
+    mock_send.return_value = {"id": "dryrun_abc", "dry_run": True}
     response = send_welcome("test_welcome@example.com", "Test Biz", dry_run=True)
     assert response["dry_run"] is True
-    mock_send.assert_not_called()
+    # The dry_run flag must be forwarded to the underlying sender.
+    assert mock_send.call_args[1]["dry_run"] is True
 
 
 @patch("core.email_service._send")

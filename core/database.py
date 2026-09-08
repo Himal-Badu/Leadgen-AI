@@ -5,28 +5,47 @@ This module provides a clean Python API over the CLI interface.
 """
 import json
 import subprocess
+import time
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Optional
 
 
-def _run_team_db(sql: str) -> list[dict[str, Any]]:
-    """Execute a SQL statement via the team-db CLI and return parsed JSON rows."""
-    result = subprocess.run(
-        ["team-db", sql],
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"team-db error: {result.stderr.strip()}")
-    output = result.stdout.strip()
-    if not output:
-        return []
-    try:
-        return json.loads(output)
-    except json.JSONDecodeError as e:
-        raise RuntimeError(f"Failed to parse team-db output: {e} — got: {output}")
+def _run_team_db(sql: str, max_retries: int = 3) -> list[dict[str, Any]]:
+    """Execute a SQL statement via the team-db CLI and return parsed JSON rows.
+
+    The shared DB is synced across concurrent writers (web app, agents, tests),
+    so transient "file locked by another process" errors can occur. Retry
+    briefly with a short backoff before giving up.
+    """
+    last_error: Optional[str] = None
+    for attempt in range(max_retries):
+        try:
+            result = subprocess.run(
+                ["team-db", sql],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except subprocess.TimeoutExpired as e:
+            last_error = f"team-db timed out after 30s: {e}"
+            time.sleep(0.5 * (attempt + 1))
+            continue
+        if result.returncode == 0:
+            output = result.stdout.strip()
+            if not output:
+                return []
+            try:
+                return json.loads(output)
+            except json.JSONDecodeError as e:
+                raise RuntimeError(f"Failed to parse team-db output: {e} — got: {output}")
+        last_error = result.stderr.strip()
+        # Only retry transient lock errors, not genuine SQL failures.
+        if "Locking error" in last_error or "lock" in last_error.lower():
+            time.sleep(0.5 * (attempt + 1))
+            continue
+        raise RuntimeError(f"team-db error: {last_error}")
+    raise RuntimeError(f"team-db error: {last_error}")
 
 
 # ─── Snapshot CRUD ────────────────────────────────────────────────────────────

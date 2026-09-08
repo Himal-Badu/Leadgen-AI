@@ -5,6 +5,23 @@ from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
 import pytest
+import stripe
+
+
+@pytest.fixture(autouse=True)
+def ensure_test_api_key():
+    """Ensure stripe.api_key is set for every test.
+
+    The env-patch in the import block below only takes effect if this module is
+    the first to import core.stripe_payments. If another test module imports it
+    earlier (e.g., web.app via test_landing), stripe.api_key stays empty, so we
+    pin a fake test key here for the duration of each test.
+    """
+    original = stripe.api_key
+    stripe.api_key = "sk_test_123"
+    yield
+    stripe.api_key = original
+
 
 # Patch stripe before importing our module
 with patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_123", "STRIPE_WEBHOOK_SECRET": "whsec_123"}):
