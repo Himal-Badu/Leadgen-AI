@@ -81,3 +81,6 @@ pytest
 ## 📄 License
 
 MIT
+
+## 🚀 Deploy on Vercel
+Deploy the landing page + API live on Vercel — see [DEPLOYMENT.md](DEPLOYMENT.md) for exact steps, environment variables (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, RESEND_API_KEY, DATA_DIR, optional DATABASE_URL) and serverless caveats.

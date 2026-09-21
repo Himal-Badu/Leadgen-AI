@@ -42,7 +42,12 @@ from core.stripe_payments import (
     process_webhook,
     construct_event,
 )
-from scripts.run_pipeline import run_full_pipeline
+try:
+    from scripts.run_pipeline import run_full_pipeline
+    PIPELINE_AVAILABLE = True
+except Exception:  # pragma: no cover - heavy pipeline deps may be absent (Vercel serverless)
+    run_full_pipeline = None
+    PIPELINE_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +140,11 @@ def request_report():
         # Optionally trigger pipeline
         if os.environ.get("TRIGGER", "").lower() in ("1", "true", "yes"):
             try:
-                results = run_full_pipeline(max_per_stage=1)
+                if PIPELINE_AVAILABLE:
+                    results = run_full_pipeline(max_per_stage=1)
+                else:
+                    results = {}
+                    logger.info("Pipeline runner not available on this runtime; skipping auto-run")
                 logger.info(f"Auto-triggered pipeline: {results}")
             except Exception as e:
                 logger.warning(f"Pipeline auto-trigger failed: {e}")

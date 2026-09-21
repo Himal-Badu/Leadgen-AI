@@ -16,8 +16,8 @@ textblob>=0.17.0
 click>=8.1.0
 python-dotenv>=1.0.0
 
-# Web (Landing Page)
-flask>=3.0.0
+# Web (Landing Page) — Vercel Python runtime ships its own WSGI glue; keep Flask <4
+flask>=3.0.0,<4.0.0
 
 # Email Delivery
 resend>=2.0.0

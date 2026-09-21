@@ -4,11 +4,44 @@ Uses the team-db CLI to read/write the shared database.
 This module provides a clean Python API over the CLI interface.
 """
 import json
+import os
+import shutil
+import sqlite3
 import subprocess
 import time
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional
+
+# True when the shared team-db CLI exists on this machine. On serverless
+# runtimes (Vercel) it does not, so we fall back to a local SQLite file.
+_TEAM_DB_AVAILABLE = shutil.which("team-db") is not None
+_LOCAL_DB_PATH: Optional[str] = None
+
+
+def _local_db_path() -> str:
+    """Return the path of the local SQLite fallback DB (DATA_DIR/localpulse.db)."""
+    global _LOCAL_DB_PATH
+    if _LOCAL_DB_PATH is None:
+        data_dir = os.environ.get("DATA_DIR", "/tmp/localpulse-data")
+        Path(data_dir).mkdir(parents=True, exist_ok=True)
+        _LOCAL_DB_PATH = os.path.join(data_dir, "localpulse.db")
+    return _LOCAL_DB_PATH
+
+
+def _run_local_sqlite(sql: str) -> list[dict[str, Any]]:
+    """Execute SQL against the local SQLite fallback DB and return rows."""
+    conn = sqlite3.connect(_local_db_path())
+    conn.row_factory = sqlite3.Row
+    try:
+        cur = conn.execute(sql)
+        if sql.lstrip().upper().startswith("SELECT"):
+            return [dict(r) for r in cur.fetchall()]
+        conn.commit()
+        return []
+    finally:
+        conn.close()
 
 
 def _run_team_db(sql: str, max_retries: int = 3) -> list[dict[str, Any]]:
@@ -17,7 +50,14 @@ def _run_team_db(sql: str, max_retries: int = 3) -> list[dict[str, Any]]:
     The shared DB is synced across concurrent writers (web app, agents, tests),
     so transient "file locked by another process" errors can occur. Retry
     briefly with a short backoff before giving up.
+
+    Serverless safety: when the team-db CLI is missing (Vercel) — or when
+    DATABASE_URL is configured (storage treated as external/optional) — we
+    transparently fall back to a local SQLite file under DATA_DIR so the app
+    never crashes on import or query just because the CLI is absent.
     """
+    if not _TEAM_DB_AVAILABLE or os.environ.get("DATABASE_URL"):
+        return _run_local_sqlite(sql)
     last_error: Optional[str] = None
     for attempt in range(max_retries):
         try:
